@@ -84,9 +84,9 @@ namespace MONOPOLY
         {
             if (this.GetOwner() == null)
             {
-                if (currentPlayer.GetCash() > this.GetHouseCost())
+                if (currentPlayer.GetCash() > this.GetBuyValue())
                 {
-                    currentPlayer.LoseCash(this.GetHouseCost());
+                    currentPlayer.LoseCash(this.GetBuyValue());
                     this.SetOwner(currentPlayer);
                     Console.Write(" купил " + this.GetName());
                 }

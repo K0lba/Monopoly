@@ -458,7 +458,8 @@ namespace MONOPOLY
                 moves--;
             }
             player.SetBoardPos(pos);
-            Console.Write( player.Name + " становится на позицию " + ((Tile)tiles[pos]).GetName());
+            Console.Write( player.Name + " становится на позицию " + tiles[pos].GetName());
+            
         }
     }
        

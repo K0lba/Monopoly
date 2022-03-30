@@ -35,6 +35,10 @@ namespace MONOPOLY
             this.Name = Name;
 
         }
+        public string GetName()
+        {
+            return this.Name;
+        }
 
 
         public bool GetBankrupt() { return IsBankrupt; }

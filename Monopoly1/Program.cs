@@ -17,6 +17,8 @@ class Game
     List<Card> Cards= new List<Card>();
     Deck[] decks = new Deck[2];
 
+    public int Y = 4;
+
 
     public Game(string[] names)
     {
@@ -80,7 +82,20 @@ class Game
     {
         return ((IDictionary<string, Object>)expando).ContainsKey(key);
     }
-    
+    private void DrawConsole()
+    {
+        int topRightX = Console.WindowWidth - players[0].Name.Length-30;
+        Console.SetCursorPosition(topRightX, 0);
+        Console.WriteLine(players[0].GetName());
+        Console.SetCursorPosition(topRightX, 1);
+        Console.WriteLine(players[0].GetCash());
+
+        Console.SetCursorPosition(0, 0);
+        Console.WriteLine(players[1].GetName());
+        Console.SetCursorPosition(0, 1);
+        Console.WriteLine(players[1].GetCash());
+    }
+
     public void RunGame()
     { 
         Player currentPlayer = players[DecideTurnOrder(players.Count, die)];
@@ -127,6 +142,7 @@ class Game
             }
             
         Tile currentTile = tiles[currentPlayer.GetBoardPos()];
+        
 
         /*bool CanAfford(Player player, double cost)
             {
@@ -247,9 +263,9 @@ class Game
        
         while (!(isGameOver(players)))//while the game is not over
         {
-            int topRightX = Console.WindowWidth - players[0].Name.Length;
-            Console.SetCursorPosition(topRightX, 0);
-            Console.Write(players[0].Name);
+            
+            DrawConsole();
+            
             if (currentPlayer.GetBankrupt())//if player is bankkrupt move to next player
             {
                     int playerNum = NextPlayer(currentPlayer);
@@ -257,25 +273,41 @@ class Game
             }
             else
             {
+                Console.SetCursorPosition(0, Y);
+                if (Y < Console.WindowHeight-2)
+                {
+                    Y ++;
+                }
+                else
+                {
+                    Console.Clear();
+                    DrawConsole();
+                    Y = 4;
+                }
                 die.roll();
                 api.Move(currentPlayer,die.GetTotal(), tiles);
                 tiles[currentPlayer.GetBoardPos()].TakeOrder(currentPlayer);
-                tiles[currentPlayer.GetBoardPos()] = new BackGround(tiles[currentPlayer.GetBoardPos()]);
-                Console.Write(((BackGround)tiles[currentPlayer.GetBoardPos()]).GetName());
+                //tiles[currentPlayer.GetBoardPos()] = new BackGround(tiles[currentPlayer.GetBoardPos()]);
+                //Console.Write(((BackGround)tiles[currentPlayer.GetBoardPos()]).GetName());
+                
+                
             }
             Console.WriteLine();
-            //Thread.Sleep(2000);
-            Console.ReadKey();
+            Thread.Sleep(2000);
+            //Console.ReadKey();
             if ((die.GetDoubleCount() == 0))
             {
                currentPlayer = players[NextPlayer(currentPlayer)];
-
+               
+               
+                
             }
             if (die.GetDoubleCount()==3)
             {
                 api.sendToJail(currentPlayer);
             }
-            }
+            
+        }
             int WinningPlayer = 0;
 
             foreach (var player in players)
@@ -285,7 +317,7 @@ class Game
 
             }
             Console.Write("The Winner is: Player " + (WinningPlayer).ToString());
-
+            
     }
 
     public static void Main(string[] args)

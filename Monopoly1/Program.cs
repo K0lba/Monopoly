@@ -84,6 +84,7 @@ class Game
     }
     private void DrawConsole()
     {
+        Console.Clear();
         int topRightX = Console.WindowWidth - players[0].Name.Length-30;
         Console.SetCursorPosition(topRightX, 0);
         Console.WriteLine(players[0].GetName());

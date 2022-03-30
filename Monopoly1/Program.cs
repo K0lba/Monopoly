@@ -17,7 +17,7 @@ class Game
     List<Card> Cards= new List<Card>();
     Deck[] decks = new Deck[2];
 
-    public int Y = 4;
+    private int Y = 4;
 
 
     public Game(string[] names)
@@ -48,19 +48,19 @@ class Game
 
 
 
-    public Tile[] GetTiles()
+    private Tile[] GetTiles()
     {
         return tiles;
     }
-    public board GetBoard()
+    private board GetBoard()
     {
         return board;
     }
-    public Player GetPlayer(int player)
+    private Player GetPlayer(int player)
     {
         return players[player];
     }
-    public List<Player> GetPlayers()
+    private List<Player> GetPlayers()
     {
         return players;
     }

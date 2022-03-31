@@ -6,7 +6,6 @@ class Game
     List<Player> players = new List<Player>();
     Player player;
     public static Die die = new Die();
-    board board;
     int numPlayers = 2;
     public static API api;
 
@@ -30,7 +29,7 @@ class Game
         decks[1] = gameDeck.ChestDeck;
 
 
-        api = new API(this.GetPlayers(), this.GetTiles(), this.GetBoard());
+        api = new API(this.GetPlayers(), this.GetTiles());
         void CreateGame(int num)
         {
             for (int i = 0; i < num; i++)
@@ -52,14 +51,6 @@ class Game
     {
         return tiles;
     }
-    private board GetBoard()
-    {
-        return board;
-    }
-    private Player GetPlayer(int player)
-    {
-        return players[player];
-    }
     private List<Player> GetPlayers()
     {
         return players;
@@ -78,14 +69,19 @@ class Game
         }
         return -1;
     }
-    public bool HasAttr(Tile expando, string key)
+    private bool HasAttr(Tile expando, string key)
     {
         return ((IDictionary<string, Object>)expando).ContainsKey(key);
     }
+    private void ClearLine(int line)
+    {
+         Console.MoveBufferArea(0, line, Console.BufferWidth, 1, Console.BufferWidth, line, ' ', Console.ForegroundColor, Console.BackgroundColor);
+    }
     private void DrawConsole()
     {
-        Console.Clear();
         int topRightX = Console.WindowWidth - players[0].Name.Length-30;
+        ClearLine(1);
+
         Console.SetCursorPosition(topRightX, 0);
         Console.WriteLine(players[0].GetName());
         Console.SetCursorPosition(topRightX, 1);
@@ -288,20 +284,13 @@ class Game
                 die.roll();
                 api.Move(currentPlayer,die.GetTotal(), tiles);
                 tiles[currentPlayer.GetBoardPos()].TakeOrder(currentPlayer);
-                //tiles[currentPlayer.GetBoardPos()] = new BackGround(tiles[currentPlayer.GetBoardPos()]);
-                //Console.Write(((BackGround)tiles[currentPlayer.GetBoardPos()]).GetName());
-                
-                
+
             }
             Console.WriteLine();
-            Thread.Sleep(2000);
-            //Console.ReadKey();
+            Thread.Sleep(1000);
             if ((die.GetDoubleCount() == 0))
             {
-               currentPlayer = players[NextPlayer(currentPlayer)];
-               
-               
-                
+                currentPlayer = players[NextPlayer(currentPlayer)];
             }
             if (die.GetDoubleCount()==3)
             {
@@ -309,15 +298,15 @@ class Game
             }
             
         }
-            int WinningPlayer = 0;
+            string WinningPlayer="";
 
             foreach (var player in players)
             {
                 if (!player.GetBankrupt())
-                    WinningPlayer = Index(player);
+                    WinningPlayer = player.GetName();
 
             }
-            Console.Write("The Winner is: Player " + (WinningPlayer).ToString());
+            Console.Write("The Winner is: Player " + WinningPlayer);
             
     }
 

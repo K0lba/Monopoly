@@ -11,14 +11,14 @@ namespace MONOPOLY
     {
         List<Player> players= new List<Player>();
         Tile[] tiles;
-        board board;
+        
 
 
-        public  API(List<Player> player, Tile[] tile, board boar)
+        public  API(List<Player> player, Tile[] tile)
         {
             this.players=player;
             this.tiles=tile;
-            this.board= boar;
+            
 
         }
         public void movePlayer(Player player, int move)
@@ -102,7 +102,7 @@ namespace MONOPOLY
         {
             player.GainCash(ammount);
         }
-        public void improveProperty(Player player, Property prop)
+        /*public void improveProperty(Player player, Property prop)
         {
             if (board.GetAvailableHouses() > 0)
             {
@@ -111,27 +111,14 @@ namespace MONOPOLY
                 prop.DeductEarnings(prop.GetHouseCost());
                 board.DecAvailableHouses();
             }
-        }
-        public void sellHouses(Player player, Property prop)
+        }*/
+        /*public void sellHouses(Player player, Property prop)
         {
             prop.SetNumHouses(prop.GetNumHouses() - 1);
             player.GainCash(prop.GetHouseCost() * board.GetHousesSellPercent());
             prop.AddEarnings(prop.GetHouseCost() * board.GetHousesSellPercent());
-        }
-        public void morgageProperty(Player player, Property prop)
-        {
-            prop.SetIsMorgaged(true);
-            player.GainCash(prop.GetBuyValue() * board.GetMorgagePercent());
-            prop.AddEarnings(prop.GetBuyValue() * board.GetMorgagePercent());
-        }
-        public void unMorgageProperty(Player player, Property property)
-        {
-
-            property.SetIsMorgaged(true);
-            player.LoseCash((property.GetBuyValue() * board.GetMorgagePercent()) * board.GetMorgageInterest());
-
-            property.AddEarnings((property.GetBuyValue() * board.GetMorgagePercent()) * board.GetMorgageInterest());
-        }
+        }*/
+        
         public bool isBankrupt(Player player, int toPay = 0)
         {
 

@@ -8,10 +8,12 @@ namespace MONOPOLY
 {
     public class Property : Tile
     {
+        public int level = 0;
         public int BuyValue;
         public int[] RentValue;
+        public int Rent;
         public int NumHouses=0;
-        private int HouseCost;
+        public int HouseCost;
         public bool IsMorgaged=false;
         public string Group;
         public Player owner;
@@ -26,6 +28,7 @@ namespace MONOPOLY
             HouseCost = houseCost;
             Group = group;  
             InGroup = ingroup;
+            Rent = RentValue[0];
 
         }
 
@@ -42,9 +45,12 @@ namespace MONOPOLY
 
         public double GetRent()
         {
-            return GetRentValue()[NumHouses];
+            return Rent;
         }
-
+        public void SetRent(int Rent)
+        {
+            this.Rent = Rent;
+        }
         public void SetNumHouses(int value) { NumHouses = value; }
 
         public int GetNumHouses() { return this.NumHouses; }
@@ -87,21 +93,25 @@ namespace MONOPOLY
                 if (currentPlayer.GetCash() > this.GetBuyValue())
                 {
                     currentPlayer.LoseCash(this.GetBuyValue());
+                    currentPlayer.AddNewProperty(this);
                     this.SetOwner(currentPlayer);
-                    Console.Write(" купил " + this.GetName());
+                    Game.tiles[currentPlayer.GetBoardPos()] = new FirstHouse(this);
+                    ((FirstHouse)Game.tiles[currentPlayer.GetBoardPos()]).LevelUp();
+                    ((FirstHouse)Game.tiles[currentPlayer.GetBoardPos()]).RentUp();
+                    Console.Write(" купил " + Game.tiles[currentPlayer.GetBoardPos()].GetName());
                 }
                 else
                 {
                     Console.Write(" Недостаточно средств ");
                 }
             }
-            /*else
+            else
             {
-                if (((Property)tiles[currentPlayer.GetBoardPos()]).GetOwner() != currentPlayer)
+                if (GetOwner() != currentPlayer)
                 {
-                    if (currentPlayer.GetCash() > ((Property)tiles[currentPlayer.GetBoardPos()]).GetRent())
+                    if (currentPlayer.GetCash() > GetRent())
                     {
-                        currentPlayer.LoseCash(((Property)tiles[currentPlayer.GetBoardPos()]).GetRent());
+                        currentPlayer.LoseCash(GetRent());
                         Console.Write(" player had payed the rent ");
                     }
                     else
@@ -111,7 +121,7 @@ namespace MONOPOLY
 
 
                 }
-            }*/
+            }
         }
     }
     class OtherTile:Tile

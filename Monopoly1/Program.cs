@@ -92,6 +92,26 @@ class Game
         Console.SetCursorPosition(0, 1);
         Console.WriteLine(players[1].GetCash());
     }
+    public static void UpgradeProperty(Tile property)
+    {
+        var newProperty = property switch
+        {
+            Monopoly => new FirstHouse((Property)property),
+            FirstHouse => new SecondHouse((Property)property),
+            SecondHouse => new ThirdHouse((Property)property),
+            ThirdHouse => new Hotel((Property)property),
+            _=>property
+        };
+        tiles[property.GetBoardPos()]= newProperty;
+        if (newProperty is not Station) Console.WriteLine(((Property)newProperty).owner.GetName()+" улучшает до "+ newProperty.GetName());
+
+    }
+    public static bool CanUpgradeProperty(Property proper, Player currentPlayer)
+    {
+        var suitableProperty = currentPlayer.GetOwenedPropertys().Where(property => property is Property prop
+        && prop.level >= proper.level && prop.Group == proper.Group).ToArray();
+        return suitableProperty.Length ==3 && currentPlayer.GetCash() >= proper.GetHouseCost();
+    }
 
     public void RunGame()
     { 
@@ -140,7 +160,7 @@ class Game
             
         Tile currentTile = tiles[currentPlayer.GetBoardPos()];
         
-
+        
         /*bool CanAfford(Player player, double cost)
             {
                 if (cost + api.getHighestRent(player) < player.GetCash())

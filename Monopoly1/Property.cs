@@ -88,6 +88,10 @@ namespace MONOPOLY
 
         public override void TakeOrder(Player currentPlayer)
         {
+            if (Game.CanUpgradeProperty(this, currentPlayer))
+            {
+                Game.UpgradeProperty(this);
+            }
             if (this.GetOwner() == null)
             {
                 if (currentPlayer.GetCash() > this.GetBuyValue())
@@ -95,14 +99,13 @@ namespace MONOPOLY
                     currentPlayer.LoseCash(this.GetBuyValue());
                     currentPlayer.AddNewProperty(this);
                     this.SetOwner(currentPlayer);
-                    Game.tiles[currentPlayer.GetBoardPos()] = new FirstHouse(this);
-                    ((FirstHouse)Game.tiles[currentPlayer.GetBoardPos()]).LevelUp();
-                    ((FirstHouse)Game.tiles[currentPlayer.GetBoardPos()]).RentUp();
-                    Console.Write(" купил " + Game.tiles[currentPlayer.GetBoardPos()].GetName());
+                    
+                    Console.Write(" купил " + this.GetName());
                 }
                 else
                 {
                     Console.Write(" Недостаточно средств ");
+                    
                 }
             }
             else
@@ -154,26 +157,25 @@ namespace MONOPOLY
     }
     public class Chance : Tile
     {
+        private string Name = "";
         public Chance(string name,int pos):base(name,pos)
         {
-
+            Name = name;
         }
         public override void TakeOrder(Player currentPlayer)
         {
-            
-            Game.api.playCard(Game.GameDeck.ChanceDeck.takeFront(), currentPlayer);
-        }
-    }
-    public class Chest : Tile
-    {
-        public Chest(string name, int pos) : base(name, pos)
-        {
-
-        }
-        public override void TakeOrder(Player currentPlayer)
-        {
-
-            Game.api.playCard(Game.GameDeck.ChestDeck.takeFront(), currentPlayer);
+            if( Name == "Chance")
+                if(Game.GameDeck.ChanceDeck.m_deck.Count!=0)
+                    Game.api.playCard(Game.GameDeck.ChanceDeck.takeFront(), currentPlayer);
+                else
+                    Game.gameDeck.Init();
+            else
+            {
+                if (Game.GameDeck.ChestDeck.m_deck.Count != 0)
+                    Game.api.playCard(Game.GameDeck.ChestDeck.takeFront(), currentPlayer);
+                else
+                    Game.gameDeck.Init();
+            }
         }
     }
     public class Station : Tile

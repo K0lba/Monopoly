@@ -30,40 +30,23 @@ namespace MONOPOLY
             Rent = RentValue[0];
 
         }
-        public int GetBuyValue() { return this.BuyValue;}
-        public double GetRent()
-        {
-            return Rent;
-        }
-        public Player GetOwner()
-        {
-            return owner;
-        }
-
-        public int GetHouseCost() { return HouseCost; }
-        public string GetGroup()
-        {
-            return Group;
-        }
-
         public void SetOwner(Player player) { owner = player; }
-  
         public override void TakeTurn(Player currentPlayer)
         {
             if (Game.CanUpgradeProperty(this, currentPlayer))
             {
                 Game.UpgradeProperty(this);
             }
-            if (this.GetOwner() == null)
+            if (this.owner == null)
             {
-                if (currentPlayer.Balance > this.GetBuyValue())
+                if (currentPlayer.Balance > this.BuyValue)
                 {
-                    currentPlayer.LoseCash(this.GetBuyValue());
+                    currentPlayer.LoseCash(this.BuyValue);
                     currentPlayer.AddNewProperty(this);
                     this.SetOwner(currentPlayer);
                     
                     Console.Write(" купил " + this.Name);
-                    Game.CanUpgradeMonopoly(currentPlayer,this.GetGroup());
+                    Game.CanUpgradeMonopoly(currentPlayer,this.Group);
                 }
                 else
                 {
@@ -73,11 +56,11 @@ namespace MONOPOLY
             }
             else
             {
-                if (GetOwner() != currentPlayer)
+                if (owner != currentPlayer)
                 {
-                    if (currentPlayer.Balance > GetRent())
+                    if (currentPlayer.Balance > Rent)
                     {
-                        currentPlayer.LoseCash(GetRent());
+                        currentPlayer.LoseCash(Rent);
                         Console.Write(" player had payed the rent ");
                     }
                     else
@@ -92,16 +75,10 @@ namespace MONOPOLY
     }
     class Start:Tile
     {
-        public string Name;
-        public int BoardPos;
-
         public Start(string name, int boardpos) : base(name,boardpos)
         {
 
         }
-
-
-
         public override void TakeTurn(Player currentPlayer)
         {
                 
@@ -116,18 +93,18 @@ namespace MONOPOLY
         }
         public override void TakeTurn(Player currentPlayer)
         {
-            if( Name == "Chance")
-                if(Game.GameDeck.ChanceDeck.m_deck.Count!=0)
-                    Game.api.playCard(Game.GameDeck.ChanceDeck.takeFront(), currentPlayer);
-                else
-                    Game.gameDeck.Init();
-            else
+            if(Game.Cards.Length!=0)
+                   Game.api.playCard(TakeFront(), currentPlayer);
+            
+        }
+        public Card TakeFront()
+        {
+            var card = Game.Cards[0];
+            for(int i=0; i<Game.Cards.Length-1;i++)
             {
-                if (Game.GameDeck.ChestDeck.m_deck.Count != 0)
-                    Game.api.playCard(Game.GameDeck.ChestDeck.takeFront(), currentPlayer);
-                else
-                    Game.gameDeck.Init();
+                Game.Cards[i] = Game.Cards[i + 1];
             }
+            return card;
         }
     }
     public class Station : Property

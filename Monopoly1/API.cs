@@ -43,17 +43,6 @@ namespace MONOPOLY
             player.GainCash(amountperplayer * count);
 
         }
-        public int  rollDice(Player player, Die dice)
-        {
-            dice.roll();
-            int roll = dice.GetTotal();
-            if (dice.GetDoubleCount() == dice.GetJailRoll())
-            {
-                sendToJail(player);
-                dice.SetDoubleCount(0);
-            }
-            return roll;
-        }
         public void sendToJail(Player player)
         {
             player.SetJailTurns(3);
@@ -84,7 +73,7 @@ namespace MONOPOLY
         }
         public void buyProperty(Player player, Property property)
         {
-            player.LoseCash(property.GetBuyValue());
+            player.LoseCash(property.BuyValue);
             player.AddNewProperty(property);
             property.SetOwner(player);
         }
@@ -125,7 +114,7 @@ namespace MONOPOLY
                 if(tiles[pos] is Property)
                 {
                     Property property = (Property)tiles[pos];
-                    if (property.GetGroup() == group)
+                    if (property.Group == group)
                     {
                         found = true;
 

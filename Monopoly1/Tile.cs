@@ -24,134 +24,71 @@ namespace MONOPOLY
 
         }
 
-
-        public void SetName(string name) { Name = name; }
-
-        public new string GetName() { return Name; }
-
-        public void SetBoardPos(int pos) { BoardPos = pos; }
-        public int GetBoardPos() { return BoardPos; }
-
-        public abstract void TakeOrder(Player currentPlayer);
+        public abstract void TakeTurn(Player currentPlayer);
 
     }
     abstract class PropertyDecorator : Property
     {
         protected Property property;
-        public PropertyDecorator(Property property) :base(property.Name, property.BoardPos, property.BuyValue, property.RentValue, property.HouseCost, property.Group, property.InGroup)
+        public PropertyDecorator(string Name, int BoardPos, int BuyValue, int[] RentValue, int HouseCost, string Group) :base(Name, BoardPos, BuyValue, RentValue, HouseCost, Group)
         {
             this.property=property;
         }
-        public virtual string GetName()
-        {
-            return property.GetName();
-        }
+        
     }
 
     class Monopoly : PropertyDecorator
     {
-        public Monopoly(Property property) : base(property)
+        public Monopoly(Property property) : base(property.Name + " in monopoly", property.BoardPos, property.BuyValue, property.RentValue, property.HouseCost, property.Group)
         {
-
+            property.level += 1;
+           
         }
 
-        public void RentUp()
-        {
-            property.SetRent(Convert.ToInt32(property.GetRent())*2);
-        }
-
-        public override string GetName()
-        {
-            return property.GetName() + " lvl doublerent";
-        }
+        
 
     }
     class FirstHouse : PropertyDecorator
     {
-        public FirstHouse(Property property):base(property)
-        {
-
-        }
-
-        public void RentUp()
-        {
-            property.SetRent(property.GetRentValue()[level]);
-        }
-
-        public void LevelUp()
+        public FirstHouse(Property property): base(property.Name, property.BoardPos, property.BuyValue, property.RentValue, property.HouseCost, property.Group)
         {
             property.level += 1;
+            property.Rent = property.RentValue[level];
+            property.Name = base.Name + "lvl" + property.level;
+
         }
-        public override string GetName()
-        {
-            return property.GetName()+" lvl 1";
-        }
+
         
     }
     class SecondHouse : PropertyDecorator
     {
-        public SecondHouse(Property property) : base(property)
-        {
-
-        }
-
-        public void RentUp()
-        {
-            property.SetRent(property.GetRentValue()[level]);
-        }
-
-        public void LevelUp()
+        public SecondHouse(Property property) : base(property.Name, property.BoardPos, property.BuyValue, property.RentValue, property.HouseCost, property.Group)
         {
             property.level += 1;
-        }
-        public override string GetName()
-        {
-            return property.GetName() + " lvl 2";
+            property.Rent = property.RentValue[level];
+            property.Name = base.Name + "lvl" + property.level;
+
         }
 
     }
     class ThirdHouse : PropertyDecorator
     {
-        public ThirdHouse(Property property) : base(property)
-        {
-
-        }
-
-        public void RentUp()
-        {
-            property.SetRent(property.GetRentValue()[level]);
-        }
-
-        public void LevelUp()
+        public ThirdHouse(Property property) : base(property.Name, property.BoardPos, property.BuyValue, property.RentValue, property.HouseCost, property.Group)
         {
             property.level += 1;
+            property.Rent = property.RentValue[level];
+            property.Name = base.Name + "lvl" + property.level;
         }
-        public override string GetName()
-        {
-            return property.GetName() + " lvl 3";
-        }
-
     }
     class Hotel : PropertyDecorator
     {
-        public Hotel(Property property) : base(property)
-        {
-
-        }
-
-        public void RentUp()
-        {
-            property.SetRent(property.GetRentValue()[level]);
-        }
-
-        public void LevelUp()
+        public Hotel(Property property) : base(property.Name, property.BoardPos, property.BuyValue, property.RentValue, property.HouseCost, property.Group)
         {
             property.level += 1;
+            property.Rent = property.RentValue[level];
+            property.Name = base.Name + "hotel";
         }
-        public override string GetName()
-        {
-            return property.GetName() + " lvl hotel";
-        }
+
 
     }
 
@@ -160,33 +97,33 @@ namespace MONOPOLY
 }
 class PropertysInit
 {
-    OtherTile Go = new OtherTile("Go", 0);
-    Property OldKentRoad = new Property("Old Kent Road", 1, 60, new int[] { 2, 10, 30, 90, 250 }, 50, "brown", 2);
+    Start Go = new Start("Go", 0);
+    Property OldKentRoad = new Property("Old Kent Road", 1, 60, new int[] { 2, 10, 30, 90, 250 }, 50, "brown");
     Chance CommunityChest = new Chance("Community Chest",2);
-    Property Whitechapel = new Property("Whitechapel",  3, 60, new int[] { 4, 20, 60, 180, 450 }, 50, "brown", 2);
-    Property KingsCrossStation = new Property("Kings Cross Station", 4, 200, new int[] { 25, 2 }, 0, "station", 0);
-    Property TheAngelIslington = new Property("The Angel Islington", 5, 100, new int[] { 6, 30, 90, 270, 550 }, 50, "lblue", 3);
+    Property Whitechapel = new Property("Whitechapel",  3, 60, new int[] { 4, 20, 60, 180, 450 }, 50, "brown");
+    Property KingsCrossStation = new Property("Kings Cross Station", 4, 200, new int[] { 25, 2 }, 0, "station");
+    Property TheAngelIslington = new Property("The Angel Islington", 5, 100, new int[] { 6, 30, 90, 270, 550 }, 50, "lblue");
     Chance Chance = new Chance("Chance", 6);
-    Property EustonRoad = new Property("Euston Road", 7, 100, new int[] { 6, 30, 90, 270, 550 }, 50, "lblue", 3);
-    Property PentonvilleRoad = new Property("Pentonville Road", 8, 120, new int[] { 8, 40, 100, 300, 600 }, 50, "lblue", 3);
+    Property EustonRoad = new Property("Euston Road", 7, 100, new int[] { 6, 30, 90, 270, 550 }, 50, "lblue");
+    Property PentonvilleRoad = new Property("Pentonville Road", 8, 120, new int[] { 8, 40, 100, 300, 600 }, 50, "lblue");
     Jail Jail = new Jail("Jail", 9);
-    Property PallMall = new Property("Pall Mall", 10, 140, new int[] { 10, 50, 150, 450, 750 }, 100, "pink", 3);
-    Property ElectricCompany = new Property("Electric Company", 11, 150, new int[] { 4, 10 }, 0, "utility", 0);
-    Property Whitehall = new Property("Whitehall",  12, 140, new int[] { 10, 50, 150, 450, 750 }, 100, "pink", 3);
-    Property Northumberland = new Property("Northumberland", 13, 160, new int[] { 12, 60, 180, 500, 900 }, 100, "pink", 3);
-    Property MaryleboneStation = new Property("Marylebone Station", 14, 200, new int[] { 25, 2 }, 0, "station", 0);
-    Property BowStreet = new Property("Bow Street", 15, 180, new int[] { 14, 70, 200, 550, 950 }, 100, "orange", 3);
-    Property MarlboroughStreet = new Property("Marlborough Street", 16, 180, new int[] { 14, 70, 200, 550, 950 }, 100, "orange", 3);
-    Property VineStreet = new Property("Vine Street", 17, 200, new int[] { 16, 80, 220, 600, 1000 }, 100, "orange", 3);
-    OtherTile FreeParking = new OtherTile("Free Parking",18);
-    Property Strand = new Property("Strand", 19, 220, new int[] { 18, 90, 250, 700, 1050 }, 150, "red", 3);
-    Property FleetStreet = new Property("Fleet Street", 20, 220, new int[] { 18, 90, 250, 700, 1050 }, 150, "red", 3);
-    Property TrafalgarSquare = new Property("Trafalgar Square", 21, 240, new int[] { 20, 100, 300, 750, 1100 }, 150, "red", 3);
-    Property FenchurchStStation = new Property("Fenchurch St Station", 22, 200, new int[] { 25, 2 }, 0, "station", 0);
-    Property WaterWorks = new Property("Water Works",  23, 150, new int[] { 4, 10 }, 0, "utility", 0);
+    Property PallMall = new Property("Pall Mall", 10, 140, new int[] { 10, 50, 150, 450, 750 }, 100, "pink");
+    Property ElectricCompany = new Property("Electric Company", 11, 150, new int[] { 4, 10 }, 0, "utility");
+    Property Whitehall = new Property("Whitehall",  12, 140, new int[] { 10, 50, 150, 450, 750 }, 100, "pink");
+    Property Northumberland = new Property("Northumberland", 13, 160, new int[] { 12, 60, 180, 500, 900 }, 100, "pink");
+    Property MaryleboneStation = new Property("Marylebone Station", 14, 200, new int[] { 25, 2 }, 0, "station");
+    Property BowStreet = new Property("Bow Street", 15, 180, new int[] { 14, 70, 200, 550, 950 }, 100, "orange");
+    Property MarlboroughStreet = new Property("Marlborough Street", 16, 180, new int[] { 14, 70, 200, 550, 950 }, 100, "orange");
+    Property VineStreet = new Property("Vine Street", 17, 200, new int[] { 16, 80, 220, 600, 1000 }, 100, "orange");
+    Start FreeParking = new Start("Free Parking",18);
+    Property Strand = new Property("Strand", 19, 220, new int[] { 18, 90, 250, 700, 1050 }, 150, "red");
+    Property FleetStreet = new Property("Fleet Street", 20, 220, new int[] { 18, 90, 250, 700, 1050 }, 150, "red");
+    Property TrafalgarSquare = new Property("Trafalgar Square", 21, 240, new int[] { 20, 100, 300, 750, 1100 }, 150, "red");
+    Property FenchurchStStation = new Property("Fenchurch St Station", 22, 200, new int[] { 25, 2 }, 0, "station");
+    Property WaterWorks = new Property("Water Works",  23, 150, new int[] { 4, 10 }, 0, "utility");
     GoToJail GoToJail = new GoToJail("Go To Jail",24);
     Chance CommunityChest2 = new Chance("Community Chest", 25);
-    Property LiverpoolStreetStation = new Property("Liverpool Street Station",26,200,new int[] { 25, 2 },0,"station",0);
+    Property LiverpoolStreetStation = new Property("Liverpool Street Station",26,200,new int[] { 25, 2 },0,"station");
     Chance Chance2 = new Chance("Chance",  27);
 
     public Tile[] Init()

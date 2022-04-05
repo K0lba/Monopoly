@@ -8,13 +8,13 @@ namespace MONOPOLY
 {
     internal class Deck
     {
-        private int type;
+        
         public List<Card> m_deck = new List<Card>();
 
 
-        public Deck(int type)
+        public Deck()
         {
-            this.type = type;
+            
         }
         public Card takeFront()
         {
@@ -71,8 +71,8 @@ namespace MONOPOLY
     }
     class CardInit
     {
-        public Deck Chestdeck = new Deck(1);
-        public Deck Chancedeck = new Deck(2);
+        public Deck Chestdeck = new Deck();
+        public Deck Chancedeck = new Deck();
 
         public Deck ChestDeck { get { return Chestdeck; } }
         public Deck ChanceDeck { get { return Chancedeck; } }

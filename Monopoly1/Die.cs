@@ -33,12 +33,7 @@ namespace MONOPOLY
         }
 
         public int GetTotal() { return m_dices[0] + m_dices[1]; }
-        public string GetTotals() { return m_dices[0].ToString()+m_dices[1].ToString() ; }
-
-        public string GetLastRoll()
-        {
-            return $"{m_dices[0]} + {m_dices[1]} = {m_dices[0] + m_dices[1]}";
-        }
+        
 
         public int GetDoubleCount()
         {

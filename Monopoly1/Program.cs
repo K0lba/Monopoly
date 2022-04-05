@@ -34,17 +34,53 @@ class Game
         {
             for (int i = 0; i < num; i++)
             {
-                Player player1 = new Player(i, "risky",names[i]);
+                Player player1 = new Player(i,names[i]);
                 players.Add(player1);
             }
         }
-
-
-
         CreateGame(numPlayers);
 
     }
+    public bool inJail(Player player)
+    {
+        if (player.jailTurns != 0)
+        {
+            if (player.HasGetOutOfJail())
+            {
+                player.UseGetOutOfJail();
+                return false;
+            }
+            player.SetJailTurns(player.jailTurns - 1);
+            return true;
+        }
+        return false;
+    }
+    private void Move(Player player, int moves, Tile[] tiles)
+    {
+        if (inJail(player))
+        {
+            Console.Write(player.Name + " is in jail");
+            return;
+        }
+        int pos = player.BoarPos;
+        while (moves != 0)
+        {
+            if ((pos + 1) == tiles.Length)
+            {
+                pos = 0;
+                Console.WriteLine(player.Name + " has passed Go and take 200");
+                player.GainCash(200);
+            }
+            else
+            {
+                pos++;
+            }
+            moves--;
+        }
+        player.SetBoardPos(pos);
+        Console.Write(player.Name + " становится на позицию " + tiles[pos].Name);
 
+    }
 
 
     private Tile[] GetTiles()
@@ -69,10 +105,7 @@ class Game
         }
         return -1;
     }
-    private bool HasAttr(Tile expando, string key)
-    {
-        return ((IDictionary<string, Object>)expando).ContainsKey(key);
-    }
+    
     private void ClearLine(int line)
     {
          Console.MoveBufferArea(0, line, Console.BufferWidth, 1, Console.BufferWidth, line, ' ', Console.ForegroundColor, Console.BackgroundColor);
@@ -83,14 +116,14 @@ class Game
         ClearLine(1);
 
         Console.SetCursorPosition(topRightX, 0);
-        Console.WriteLine(players[0].GetName());
+        Console.WriteLine(players[0].Name);
         Console.SetCursorPosition(topRightX, 1);
-        Console.WriteLine(players[0].GetCash());
+        Console.WriteLine(players[0].Balance);
 
         Console.SetCursorPosition(0, 0);
-        Console.WriteLine(players[1].GetName());
+        Console.WriteLine(players[1].Name);
         Console.SetCursorPosition(0, 1);
-        Console.WriteLine(players[1].GetCash());
+        Console.WriteLine(players[1].Balance);
     }
     public static void UpgradeProperty(Tile property)
     {
@@ -102,15 +135,38 @@ class Game
             ThirdHouse => new Hotel((Property)property),
             _=>property
         };
-        tiles[property.GetBoardPos()]= newProperty;
-        if (newProperty is not Station) Console.WriteLine(((Property)newProperty).owner.GetName()+" улучшает до "+ newProperty.GetName());
-
+        if(newProperty is Property)
+        tiles[property.BoardPos]= newProperty;
+        Console.WriteLine(((Property)newProperty).owner.Name+" улучшает до "+ newProperty.Name);
+        
     }
     public static bool CanUpgradeProperty(Property proper, Player currentPlayer)
     {
-        var suitableProperty = currentPlayer.GetOwenedPropertys().Where(property => property is Property prop
+        var suitableProperty = currentPlayer.OwenedProperties.Where(property => property is Monopoly prop
         && prop.level >= proper.level && prop.Group == proper.Group).ToArray();
-        return suitableProperty.Length ==3 && currentPlayer.GetCash() >= proper.GetHouseCost();
+        return suitableProperty.Length ==3 && currentPlayer.Balance >= proper.GetHouseCost();
+    }
+    public static void CanUpgradeMonopoly(Player currentPlayer, string group)
+    {
+        List<Property> properties = new List<Property>();
+        foreach(var property in currentPlayer.OwenedProperties)
+        {
+            if(group == property.GetGroup())
+            {
+                properties.Add(property);
+            }    
+        }
+        if (properties.Count == 3)
+        {
+            foreach(var prop in properties)
+            {
+                tiles[prop.BoardPos] = new Monopoly(prop);
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine(currentPlayer.Name + "улучшает" + tiles[prop.BoardPos].Name);
+                Console.ForegroundColor = ConsoleColor.White;
+            }
+            
+        }
     }
 
     public void RunGame()
@@ -137,7 +193,7 @@ class Game
             int bankrupt = 0;
             for (int i = 0; i < plyers.Count; i++)
             {
-                if (players[i].GetBankrupt())
+                if (players[i].IsBankrupt)
                 {
                     bankrupt++;
                 }
@@ -158,132 +214,17 @@ class Game
                 return nplayer;
             }
             
-        Tile currentTile = tiles[currentPlayer.GetBoardPos()];
         
         
-        /*bool CanAfford(Player player, double cost)
-            {
-                if (cost + api.getHighestRent(player) < player.GetCash())
-                {
-                    return true;
-                }
-                return false;
-            }*/
-        /*List<dynamic> isBuyingHouses(Player player)
-            {
-                List<dynamic> list = new List<dynamic>();
-                List<Property> playersProperties = player.GetOwenedPropertys();
-                int lowestCost = 9999;
-
-                Property cheapestHouseProperty = null;
-
-                foreach (var property in playersProperties)
-                {
-                    if (api.inMonopoly(property, player))
-                    {
-                        if (property.GetHouseCost() < lowestCost && property.GetNumHouses() < 5 && api.checkIfEvenBuild(property, player) && board.GetAvailableHouses() > 0)
-                        {
-
-                            lowestCost = property.GetHouseCost();
-
-                            cheapestHouseProperty = property;
-
-                        }
-                    }
-                }
-                if (CanAfford(player, lowestCost) && !(cheapestHouseProperty == null))
-                {
-                    list.Add(true);
-                    list.Add(cheapestHouseProperty);
-                    return list;
-                }
-
-
-                else
-                {
-                    list.Add(false);
-                    return list;
-                }
-
-
-            }*/
-        /*void sellForCash(Player player)
-            {
-                List<Property> properties = player.GetOwenedPropertys();
-                int lowestCost = 9999;
-                Property selling = null;
-                bool sellImprovments = false;
-                foreach (var property in properties)
-                {
-                    if ((property.GetBuyValue() < lowestCost) && property is Utility && !(property.GetIsMorgaged()))
-                    {
-                        lowestCost = property.GetBuyValue();
-                        selling = property;
-                    }
-                }
-                if (lowestCost == 9999)
-                {
-                    foreach (var property in properties)
-                    {
-                        if ((property.GetBuyValue() < lowestCost) && (!(api.inMonopoly(property, player))) && !(property.GetIsMorgaged()))
-                        {
-                            lowestCost = property.GetBuyValue();
-                            selling = property;
-                        }
-                    }
-                }
-                if (lowestCost == 9999)
-                {
-                    foreach (var property in properties)
-                    {
-                        if ((property.GetBuyValue() < lowestCost) && (!(property.GetIsMorgaged())) && (api.GetNumHouses(player, property.GetGroup()) == 0))
-                        {
-                            lowestCost = property.GetBuyValue();
-                            selling = property;
-                        }
-                    }
-                }
-                if (lowestCost == 9999)
-                {
-                    foreach (var property in properties)
-                    {
-                        if (HasAttr(property, "GetHouseCost"))
-                        {
-                            if ((property.GetHouseCost() < lowestCost) && !(property.GetIsMorgaged()) && property.GetNumHouses() > 0 && api.checkIfEvenBuild(property, player, false))
-                            {
-                                sellImprovments = true;
-                                lowestCost = property.GetHouseCost();
-                                selling = property;
-                            }
-
-                        }
-
-                    }
-                }
-                if (!(selling == null))
-                {
-                    if (sellImprovments == true)
-                    {
-                        api.sellHouses(player, selling);
-                        Console.Write("player " + (player.GetRollOrder()).ToString() + " sells imporvements on " + (selling.GetName()).ToString());
-                    }
-
-                    else if (sellImprovments == false)
-                    {
-                        api.morgageProperty(player, selling);
-
-
-                        Console.Write("player " + (player.GetRollOrder()), ToString() + " morgages " + (selling.GetName()).ToString());
-                    }
-                }
-            }*/
+        
+       
        
         while (!(isGameOver(players)))//while the game is not over
         {
             
             DrawConsole();
             
-            if (currentPlayer.GetBankrupt())//if player is bankkrupt move to next player
+            if (currentPlayer.IsBankrupt)//if player is bankkrupt move to next player
             {
                     int playerNum = NextPlayer(currentPlayer);
                     currentPlayer = players[playerNum];
@@ -298,16 +239,18 @@ class Game
                 else
                 {
                     Console.Clear();
-                    DrawConsole();
                     Y = 4;
+                    DrawConsole();
+                    Console.SetCursorPosition(0,Y);
+                    
                 }
                 die.roll();
-                api.Move(currentPlayer,die.GetTotal(), tiles);
-                tiles[currentPlayer.GetBoardPos()].TakeOrder(currentPlayer);
+                Move(currentPlayer,die.GetTotal(), tiles);
+                tiles[currentPlayer.BoarPos].TakeTurn(currentPlayer);
 
             }
             Console.WriteLine();
-            Thread.Sleep(1000);
+            Thread.Sleep(100);
             if ((die.GetDoubleCount() == 0))
             {
                 currentPlayer = players[NextPlayer(currentPlayer)];
@@ -322,8 +265,8 @@ class Game
 
             foreach (var player in players)
             {
-                if (!player.GetBankrupt())
-                    WinningPlayer = player.GetName();
+                if (!player.IsBankrupt)
+                    WinningPlayer = player.Name;
 
             }
             Console.Write("The Winner is: Player " + WinningPlayer);

@@ -18,75 +18,37 @@ namespace MONOPOLY
         public string Group;
         public Player owner;
         public double earning = 0;
-        public int InGroup;
+       
         public Tile tile;
 
-        public Property(string name, int boardpos, int buyValue,int[] rentValue, int houseCost, string group, int ingroup ):base(name,boardpos)
+        public Property(string name, int boardpos, int buyValue,int[] rentValue, int houseCost, string group ):base(name,boardpos)
         {
             BuyValue = buyValue;
             RentValue=rentValue;
             HouseCost = houseCost;
             Group = group;  
-            InGroup = ingroup;
             Rent = RentValue[0];
 
         }
-
-        public void SetBuyValue(int value) { this.BuyValue = value; }
-
         public int GetBuyValue() { return this.BuyValue;}
-
-        public void SetRentValue(int[] value) { this.RentValue = value;}
-
-        public int[] GetRentValue() 
-        {
-            return this.RentValue;
-        }
-
         public double GetRent()
         {
             return Rent;
         }
-        public void SetRent(int Rent)
+        public Player GetOwner()
         {
-            this.Rent = Rent;
+            return owner;
         }
-        public void SetNumHouses(int value) { NumHouses = value; }
-
-        public int GetNumHouses() { return this.NumHouses; }
-
-        public void SetHouseCost(int value) { HouseCost = value; }
 
         public int GetHouseCost() { return HouseCost; }
-
-        public void SetIsMorgaged(bool value) { IsMorgaged = value; }
-
-        public bool GetIsMorgaged() { return IsMorgaged; }
-
-        
-        
-        public void SetGroup(string value)
-        {
-            Group = value;
-        }
-
         public string GetGroup()
         {
             return Group;
         }
 
-        public int GetInGroup() { return InGroup; }
-
         public void SetOwner(Player player) { owner = player; }
-
-        public Player GetOwner() { return owner; }
-
-        public void AddEarnings(double ammount) { earning += ammount; }
-
-        public void DeductEarnings(int ammount) { earning -= ammount; }
-        public double GetEarnings() { return earning; }
-
-        public override void TakeOrder(Player currentPlayer)
+  
+        public override void TakeTurn(Player currentPlayer)
         {
             if (Game.CanUpgradeProperty(this, currentPlayer))
             {
@@ -94,25 +56,26 @@ namespace MONOPOLY
             }
             if (this.GetOwner() == null)
             {
-                if (currentPlayer.GetCash() > this.GetBuyValue())
+                if (currentPlayer.Balance > this.GetBuyValue())
                 {
                     currentPlayer.LoseCash(this.GetBuyValue());
                     currentPlayer.AddNewProperty(this);
                     this.SetOwner(currentPlayer);
                     
-                    Console.Write(" купил " + this.GetName());
+                    Console.Write(" купил " + this.Name);
+                    Game.CanUpgradeMonopoly(currentPlayer,this.GetGroup());
                 }
                 else
                 {
                     Console.Write(" Недостаточно средств ");
-                    
+                   
                 }
             }
             else
             {
                 if (GetOwner() != currentPlayer)
                 {
-                    if (currentPlayer.GetCash() > GetRent())
+                    if (currentPlayer.Balance > GetRent())
                     {
                         currentPlayer.LoseCash(GetRent());
                         Console.Write(" player had payed the rent ");
@@ -127,30 +90,19 @@ namespace MONOPOLY
             }
         }
     }
-    class OtherTile:Tile
+    class Start:Tile
     {
         public string Name;
         public int BoardPos;
 
-        public OtherTile()
-        {
-
-        }
-
-        public OtherTile(string name, int boardpos) : base(name,boardpos)
+        public Start(string name, int boardpos) : base(name,boardpos)
         {
 
         }
 
 
-        public void SetName(string name) { Name = name; }
 
-        public new string GetName() { return Name; }
-
-        public void SetBoardPos(int pos) { BoardPos = pos; }
-        public int GetBoardPos() { return BoardPos; }
-
-        public override void TakeOrder(Player currentPlayer)
+        public override void TakeTurn(Player currentPlayer)
         {
                 
         }
@@ -162,7 +114,7 @@ namespace MONOPOLY
         {
             Name = name;
         }
-        public override void TakeOrder(Player currentPlayer)
+        public override void TakeTurn(Player currentPlayer)
         {
             if( Name == "Chance")
                 if(Game.GameDeck.ChanceDeck.m_deck.Count!=0)
@@ -178,9 +130,13 @@ namespace MONOPOLY
             }
         }
     }
-    public class Station : Tile
+    public class Station : Property
     {
-        public override void TakeOrder(Player currentPlayer)
+        public Station(string name, int boardpos, int buyValue, int[] rentValue, int houseCost, string group) : base(name, boardpos, buyValue, rentValue, houseCost, group)
+        {
+        }
+
+        public override void TakeTurn(Player currentPlayer)
         {
             
         }
@@ -191,7 +147,7 @@ namespace MONOPOLY
         {
 
         }
-        public override void TakeOrder(Player currentPlayer)
+        public override void TakeTurn(Player currentPlayer)
         {
             Game.api.sendToJail(currentPlayer);
         }
@@ -202,7 +158,7 @@ namespace MONOPOLY
         {
                
         }
-        public override void TakeOrder(Player currentPlayer)
+        public override void TakeTurn(Player currentPlayer)
         {
         }
     }
